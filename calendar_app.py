@@ -1,13 +1,23 @@
 import datetime
+import os.path
+import os
+import pytz
 from datetime import datetime as Datetime
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+
 
 class CalendarEvent():
-    def __init__(self):
-        self.next_time = 0
+    def __init__(self, apikey, creds):
+        self.creds = creds
+        self.next_time = self.get_next_meeting_time(self.creds)
+        
+        
 
-    def get_month_days(month, year):
+    def get_month_days(self, month, year):
         days = 0
         match month:
             case 1 | 3 | 5 | 7 | 8 | 10 | 12:
@@ -17,14 +27,17 @@ class CalendarEvent():
                     days = 29
                 else:
                     days = 28
-            case 4 | 60 | 9 | 11:
+            case 4 | 6 | 9 | 11:
                 days = 30
         return days
 
     def get_next_meeting_time(self, creds):
         try:
             service = build("calendar", "v3", credentials=creds)
-            now = Datetime.utcnow().isoformat() + "Z"
+            tz = pytz.timezone('America/Los_Angeles')
+            now = datetime.datetime.utcnow().isoformat() + "Z"
+            #now = Datetime.now(datetime.timezone.utc).astimezone(tz).isoformat()
+            #print(now)
             events_result = (
                 service.events()
                 .list(
@@ -33,6 +46,7 @@ class CalendarEvent():
                     maxResults=1,
                     singleEvents=True,
                     orderBy="startTime",
+                    timeZone='UTC'
                 )
                 .execute()
             )
@@ -43,6 +57,7 @@ class CalendarEvent():
             for event in events:
                 self.event = event
                 start = event["start"].get("dateTime", event["start"].get("date"))
+                #print(start)
                 date = start.split('T')[0]
                 year = int(date.split('-')[0])
                 month = int(date.split('-')[1])
@@ -52,14 +67,21 @@ class CalendarEvent():
                 hour = int(time.split(':')[0])
                 minute = int(time.split(':')[1])
 
-                final_time = minute + (hour * 60) + (day * 24 * 60) + (month * self.get_month_days(month, year) * 24 * 60) + (year * self.get_month_days(month, year) * 24 * 60 * 365)
+                final_time = minute + (hour * 60) + (day * 24 * 60) + (month * self.get_month_days(month, year) * 24 * 60) + (year * month * self.get_month_days(month, year) * 24 * 60)
                 self.next_time = final_time
+                
                 return final_time
         except HttpError as error:
             print(f"An error occurred: {error}")
             return
         
     def get_event(self):  
+        if 'summary' not in self.event:
+            self.event['summary'] = 'blank'
+        event_details = [self.event['location'], self.event['summary']]
+        return event_details
+    
+    def time_diff(self):
         utc_dt = Datetime.now(datetime.timezone.utc)
         cur_time = utc_dt.astimezone().isoformat('T')
         split2 = cur_time.split('T')[0]
@@ -71,11 +93,7 @@ class CalendarEvent():
         hour2 = int(time2.split(':')[0])
         minute2 = int(time2.split(':')[1])
 
-        final_cur_time = minute2 + (hour2 * 60) + (day2 * 24 * 60) + (month2 * self.get_month_days(month2, year2) * 24 * 60) + (year2 * self.get_month_days(month2, year2) * 24 * 60)
-
-        if 'summary' not in self.event:
-            self.event['summary'] = 'blank'
-        event_details = [final_cur_time, self.event['location'], self.event['summary']]
-        return event_details
-
+        final_cur_time = minute2 + (hour2 * 60) + (day2 * 24 * 60) + (month2 * self.get_month_days(month2, year2) * 24 * 60) + (year2 * month2 * self.get_month_days(month2, year2) * 24 * 60)
+        print(self.next_time - final_cur_time)
+        return self.next_time - final_cur_time
         
