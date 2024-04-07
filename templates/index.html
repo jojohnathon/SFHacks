@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+
+{% block body %}
+    <div class="home">  
+        <div class="home-heading">  
+            <h1 class="home-topheading">
+                Welcome
+            </h1>
+            <h5 class="home-subheading">
+                Please Login with Your Google Account
+            </h5>
+        </div>
+            <form action="/" method="POST">
+                <input class="google-button" type="submit" value="Log in with Google" name="login">
+            </form>
+    </div>
+{% endblock %}

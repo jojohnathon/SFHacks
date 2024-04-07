@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="dashboard" background="/static/y-so-serious-white.jpg">
+  <div class="container">
+    <div class="dashboard-logout-row">
+      <div class="dashboard-topheading">
+        <h1>Welcome, Tyler!</h1>
+      </div>
+      <form action="/dashboard" method="POST">
+        <input class="logout-button" type="submit" value="Log out" name="logout">
+      </form>
+    </div>
+    <div class="dashboard-row-1">
+      <div class="nextevent">
+        <div class="nextevent-details">
+          <h1 class="nextevent-heading">{{ event1_desc }}</h1>
+          <span class="nextevent-desc">
+            <img src={{ url_for('static', filename='clock.svg') }} alt="Time" >
+            <p>{{ event1_time }}</p>
+          </span>
+          <span class="nextevent-desc">
+            <img src={{ url_for('static', filename='location.svg') }}>
+            <p> {{ event1_loc }}</p>
+          </span>
+          <span class="nextevent-desc">
+            <img src={{ url_for('static', filename='info.svg') }}>
+            <p>Leave in {{ event1_travel }} minutes if you want to be on time!</p>
+          </span>
+        </div>
+      </div>
+      <div class="userProfile">
+        <div class="usp-top">
+          <img src={{ url_for('static', filename='inbox.svg') }}/>
+          <p>It seems like there's a traffic jam today. You need to leave 1 hour earlier.</p>
+        </div>
+        <a class="route-link">
+          See the best Route
+        </a>
+      </div>
+    </div>
+    
+      <!-- TODO style email separately -->
+      <!-- <p>{{ email }}</p> -->
+    
+    <div class="dashboard-row-2">
+      <div class="upcoming-event-block">
+        <h1>Upcoming Events</h1>
+        <div class="upcoming-events">
+          <div class="upcoming-event">
+            <h2>Coding Session with Josdhua</h1>
+            <p>12:00AM Wed April 02
+          </div>
+          <div class="upcoming-event">
+            <h2>Machine Learning Workshop</h1>
+            <p>2:00PM Wed April 8
+          </div>
+          <div class="upcoming-event">
+            <h2>Meeting with Robert</h1>
+            <p>10:00AM Wed April 9
+          </div>
+          <div class="upcoming-event">
+            <h2>Weekly Team Meeting</h1>
+            <p>10:00AM Wed April 10</p>
+          </div>
+          <div class="upcoming-event">
+            <h2>Tennis Court</h1>
+            <p>4:00PM Fri April 12
+          
+        </div>
+      </div>
+    </div>
+  </div>
+<div>
+{% endblock %}

@@ -12,13 +12,13 @@ import aiIntegration
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 
+
 class PunctuApp():
   def __init__(self):
     # initialized once, never changed
     self.creds = ''
     self.distMatrix = distanceMatrix(matrixkey.API_KEY)
-    self.login()
-    self.calendar = CalendarEvent(matrixkey.API_KEY, self.creds)
+    
     # changed on event refresh
     self.next_event = []
     self.next_time = -1
@@ -26,7 +26,7 @@ class PunctuApp():
     # changed on 3 hr mark
     self.time_to_dest = -1
 
-    self.refresh_next_event()
+    
     
   def login(self):
     creds = None
@@ -38,6 +38,7 @@ class PunctuApp():
       self.creds = creds
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
+      #print(creds.to_json())
       if creds and creds.expired and creds.refresh_token:
         creds.refresh(Request())
         self.creds = Credentials.from_authorized_user_file("token.json", SCOPES)
@@ -46,10 +47,12 @@ class PunctuApp():
             "credentials.json", SCOPES
         )
         creds = flow.run_local_server(port=0)
-      # Save the credentials for the next run
+      # Save the credentials for the next frun
       with open("token.json", "w") as token:
         token.write(creds.to_json())
-
+      
+    self.calendar = CalendarEvent(matrixkey.API_KEY, self.creds)
+    self.refresh_next_event()
   def logout(self):
     if os.path.exists('token.json'):
       os.remove('token.json')
@@ -63,12 +66,13 @@ class PunctuApp():
     self.email = aiIntegration.email_TF(self.next_event[1])
   def get_next_time(self):
     return self.next_time
-  def get_event_sum(self):
-    return self.next_event[1]
+  def get_event(self):
+    return self.next_event
   def get_is_email(self):
     return self.email
-  def get_destination(self):
-    return self.next_event[0]
+  
+  def get_realtime(self):
+    return self.calendar.get_realtime()
   
   def update(self):
 
@@ -79,10 +83,4 @@ class PunctuApp():
     if self.calendar.time_diff() <= 0:
       self.refresh_next_event()
       print(self.get_is_email())
-
-if __name__ == '__main__':
-  app = PunctuApp()
-
-  loop = True
-  while(loop):
-    app.update()
+      

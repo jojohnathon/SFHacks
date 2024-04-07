@@ -17,5 +17,5 @@ class distanceMatrix():
     
 if __name__ == '__main__':
     test = distanceMatrix(matrixkey.API_KEY)
-    print(test.get_traffic_time('Skyline College'))
+    print(test.get_traffic_time('Skyline College')['rows'][0]['elements'][0]['duration']['value'])
     #print(gmaps.Client(matrixkey.API_KEY).geolocate())
